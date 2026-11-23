@@ -350,7 +350,12 @@ The server binds to `0.0.0.0` and reads the port from the `PORT` environment var
 
 ## Vercel Container Deployment
 
-The project is configured for Vercel Container Deployment using `Dockerfile.vercel`.
+The project is deployed on Vercel Container Deployment using `Dockerfile.vercel`.
+
+### Production URL
+
+- **Public dashboard**: https://logsentinel-three.vercel.app
+- **Health endpoint**: https://logsentinel-three.vercel.app/api/health
 
 ### Deploy to Vercel
 
@@ -359,6 +364,16 @@ The project is configured for Vercel Container Deployment using `Dockerfile.verc
 3. From the project directory: `vercel --prod`
 4. The production URL will be provided after deployment.
 
+### Important Deployment Steps
+
+After deploying via the CLI, you must also:
+
+1. **Enable Container Deployment** in the Vercel dashboard:
+   - Go to https://vercel.com/dashboard → select your project → Settings → General
+   - Enable "Container Deployment" (or the equivalent framework preset for Docker)
+2. **Disable deployment protection** (to make the URL publicly accessible):
+   - Vercel CLI: `vercel project protection disable --sso --yes`
+
 ### Deployment Notes
 
 - The Docker build uses Eclipse Temurin JDK 17 for the build stage and Eclipse Temurin JRE 17 for the runtime stage.
@@ -366,6 +381,7 @@ The project is configured for Vercel Container Deployment using `Dockerfile.verc
 - The application starts with `java -jar app.jar --dashboard`.
 - Vercel provides the `PORT` environment variable at runtime; the server reads it and binds to `0.0.0.0`.
 - Dashboard state (`AnalysisSession`) is held in memory per container instance. Container restarts clear the session. No external database is used.
+- Docker image could not be built locally during this audit (Docker daemon not available on the build machine). Container execution remains unverified locally but the Dockerfile follows standard multi-stage best practices.
 
 ---
 
