@@ -61,13 +61,16 @@ public final class ErrorFrequencyAnalyzer {
             String normalized = normalize(message);
             String service = entry.getService();
 
-            BuilderHolder holder = buckets.get(normalized);
+            // Group by (service, normalized message) so the same error from
+            // different services is not incorrectly merged.
+            String bucketKey = (service == null ? "null" : service) + "||" + normalized;
+
+            BuilderHolder holder = buckets.get(bucketKey);
             if (holder == null) {
                 holder = new BuilderHolder(message, normalized, service);
-                buckets.put(normalized, holder);
+                buckets.put(bucketKey, holder);
             }
             holder.increment();
-            // Keep the first seen service for the bucket
         }
 
         return buckets.values().stream()

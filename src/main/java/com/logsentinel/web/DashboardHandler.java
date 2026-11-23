@@ -67,7 +67,7 @@ public class DashboardHandler extends ApiHandler {
                 sendError(exchange, 404, "Not found");
             }
         } catch (Exception e) {
-            sendError(exchange, 500, "Internal server error: " + e.getMessage());
+            sendError(exchange, 500, "Internal server error");
         }
     }
 

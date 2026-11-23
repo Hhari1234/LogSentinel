@@ -5,7 +5,7 @@ A command-line and web-based Core Java application that reads application log fi
 Built as a learning and interview-preparation project. No frameworks, no databases, no external dependencies — just Core Java.
 
 ```
-mvn clean test  -> 70 tests pass, BUILD SUCCESS
+mvn clean test  -> 104 tests pass, BUILD SUCCESS
 mvn clean package -> BUILD SUCCESS, jar produced
 ```
 
@@ -186,13 +186,19 @@ The CLI displays an interactive menu:
 ```powershell
 cd C:\LogSentinel
 mvn clean package
-java -cp target/classes com.logsentinel.web.DashboardServer
+java -cp target/classes com.logsentinel.Main --dashboard
 ```
 
 Or with a custom port:
 
 ```powershell
-java -cp target/classes com.logsentinel.web.DashboardServer --port 9090
+java -cp target/classes com.logsentinel.Main --dashboard --port 9090
+```
+
+Or using the PORT environment variable:
+
+```powershell
+$env:PORT=9090; java -cp target/classes com.logsentinel.Main --dashboard
 ```
 
 Then open your browser to:
@@ -287,9 +293,9 @@ cd C:\LogSentinel
 mvn clean test
 ```
 
-Result: **70 tests, 0 failures, BUILD SUCCESS.**
+Result: **104 tests, 0 failures, BUILD SUCCESS.**
 
-Tests cover: valid/invalid parsing, missing/empty files, level counting, error frequency, date grouping, keyword search, incident detection, time-window boundaries, sequential/parallel consistency, report generation, CSV escaping, and dashboard API.
+Tests cover: valid/invalid parsing, missing/empty files, level counting, error frequency, date grouping, keyword search, incident detection, time-window boundaries, sequential/parallel consistency, report generation, CSV escaping, dashboard API, empty datasets, special characters, Unicode, and error monitoring.
 
 Package the jar:
 
@@ -312,6 +318,57 @@ Generates deterministic sample files (1/10/50/100 MB) and measures sequential vs
 
 ---
 
+## Docker Deployment
+
+A multi-stage Dockerfile is provided for container deployment (e.g. Vercel Container Deployment):
+
+```dockerfile
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /workspace
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /workspace/target/logsentinel-1.0.0.jar app.jar
+EXPOSE 8080
+ENV PORT=8080
+ENTRYPOINT ["java", "-jar", "app.jar", "--dashboard"]
+```
+
+Build and run locally:
+
+```powershell
+docker build -f Dockerfile.vercel -t logsentinel:vercel .
+docker run -p 8080:8080 -e PORT=8080 logsentinel:vercel
+```
+
+The server binds to `0.0.0.0` and reads the port from the `PORT` environment variable (default: 8080). It handles SIGTERM for graceful shutdown.
+
+---
+
+## Vercel Container Deployment
+
+The project is configured for Vercel Container Deployment using `Dockerfile.vercel`.
+
+### Deploy to Vercel
+
+1. Install the Vercel CLI: `npm install -g vercel`
+2. Log in: `vercel login`
+3. From the project directory: `vercel --prod`
+4. The production URL will be provided after deployment.
+
+### Deployment Notes
+
+- The Docker build uses Eclipse Temurin JDK 17 for the build stage and Eclipse Temurin JRE 17 for the runtime stage.
+- The executable JAR (`logsentinel-1.0.0.jar`) is copied into the runtime image as `app.jar`.
+- The application starts with `java -jar app.jar --dashboard`.
+- Vercel provides the `PORT` environment variable at runtime; the server reads it and binds to `0.0.0.0`.
+- Dashboard state (`AnalysisSession`) is held in memory per container instance. Container restarts clear the session. No external database is used.
+
+---
+
 ## Security Considerations
 
 - File uploads are validated for extension (`.log`, `.txt` only) and size (max 50 MB)
@@ -319,7 +376,8 @@ Generates deterministic sample files (1/10/50/100 MB) and measures sequential vs
 - Files are stored in a temporary directory and deleted after processing
 - No execution of uploaded file contents
 - No arbitrary filesystem access via API endpoints
-- The dashboard server binds to localhost only
+- The dashboard server binds to 0.0.0.0 and reads the port from the PORT environment variable
+- Error responses do not expose internal exception details
 
 ---
 
@@ -327,9 +385,10 @@ Generates deterministic sample files (1/10/50/100 MB) and measures sequential vs
 
 - Incident detection requires valid timestamps; errors without timestamps are excluded from time-window analysis
 - Incident detection flags suspicious repetition only — not confirmed root causes
-- Dashboard stores the latest analysis session in memory; restarting the server clears it
+- Dashboard stores the latest analysis session in memory per container instance; container restarts clear it
 - Parallel processing uses bounded in-memory batches; extremely wide lines could increase per-batch memory
 - The dashboard is single-user (one session at a time)
+- Session data is not shared across multiple container instances (e.g. when scaled on Vercel)
 - Screenshots must be captured manually (no browser automation tool in this build environment)
 
 ---

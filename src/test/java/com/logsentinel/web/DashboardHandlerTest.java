@@ -201,4 +201,28 @@ class DashboardHandlerTest {
         assertEquals(404, conn.getResponseCode());
         conn.disconnect();
     }
+
+    @Test
+    void healthEndpointWithNoSession() throws Exception {
+        DashboardStore emptyStore = new DashboardStore();
+        com.sun.net.httpserver.HttpServer emptyServer =
+                com.sun.net.httpserver.HttpServer.create(new java.net.InetSocketAddress(0), 0);
+        emptyServer.createContext("/api/health", new DashboardHandler(emptyStore));
+        emptyServer.start();
+        int emptyPort = emptyServer.getAddress().getPort();
+
+        try {
+            URL url = new URL("http://localhost:" + emptyPort + "/api/health");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            assertEquals(200, conn.getResponseCode());
+            try (var is = conn.getInputStream()) {
+                String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                assertTrue(body.contains("\"hasSession\":false"));
+            }
+            conn.disconnect();
+        } finally {
+            emptyServer.stop(0);
+        }
+    }
 }

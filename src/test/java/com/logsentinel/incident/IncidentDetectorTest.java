@@ -147,6 +147,51 @@ class IncidentDetectorTest {
         assertEquals(IncidentSeverity.CRITICAL, incidents.get(0).getSeverity());
     }
 
+    @Test
+    void sameMessageDifferentTimesAreSeparateIncidents() {
+        List<LogEntry> entries = new java.util.ArrayList<>();
+        LocalDateTime base = LocalDateTime.of(2026, Month.NOVEMBER, 23, 10, 0, 0);
+        // 5 errors at 10:00
+        for (int i = 0; i < 5; i++) {
+            entries.add(entry(base.plusSeconds(i), "Connection timeout", "DatabaseService"));
+        }
+        // 5 errors at 10:30 (outside 1-minute window)
+        for (int i = 0; i < 5; i++) {
+            entries.add(entry(base.plusMinutes(30).plusSeconds(i), "Connection timeout", "DatabaseService"));
+        }
+
+        List<Incident> incidents = new IncidentDetector(5, 1).detect(entries);
+        assertEquals(2, incidents.size());
+    }
+
+    @Test
+    void severityCriticalWhenCountIsDoubleThreshold() {
+        List<LogEntry> entries = new java.util.ArrayList<>();
+        LocalDateTime base = LocalDateTime.of(2026, Month.NOVEMBER, 23, 10, 0, 0);
+        // 10 errors = threshold(5) * 2, should be CRITICAL
+        for (int i = 0; i < 10; i++) {
+            entries.add(entry(base.plusSeconds(i), "Critical error", "ServiceA"));
+        }
+
+        List<Incident> incidents = new IncidentDetector(5, 1).detect(entries);
+        assertEquals(1, incidents.size());
+        assertEquals(IncidentSeverity.CRITICAL, incidents.get(0).getSeverity());
+    }
+
+    @Test
+    void severityHighWhenCountAtThreshold() {
+        List<LogEntry> entries = new java.util.ArrayList<>();
+        LocalDateTime base = LocalDateTime.of(2026, Month.NOVEMBER, 23, 10, 0, 0);
+        // 5 errors = threshold, should be HIGH
+        for (int i = 0; i < 5; i++) {
+            entries.add(entry(base.plusSeconds(i), "High error", "ServiceB"));
+        }
+
+        List<Incident> incidents = new IncidentDetector(5, 1).detect(entries);
+        assertEquals(1, incidents.size());
+        assertEquals(IncidentSeverity.HIGH, incidents.get(0).getSeverity());
+    }
+
     private static LogEntry entry(LocalDateTime timestamp, String message, String service) {
         return LogEntry.builder()
                 .lineNumber(1)

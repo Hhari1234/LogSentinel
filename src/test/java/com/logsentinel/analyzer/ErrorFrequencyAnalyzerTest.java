@@ -99,6 +99,45 @@ class ErrorFrequencyAnalyzerTest {
         assertEquals(1, result.get(0).getCount());
     }
 
+    @Test
+    void groupsByNormalizedMessagePreservesFirstOriginal() {
+        List<LogEntry> entries = List.of(
+                error("Connection  timeout", "DatabaseService"),
+                error("Connection timeout", "DatabaseService"),
+                error("Connection\ttimeout", "DatabaseService")
+        );
+
+        List<ErrorFrequency> result = new ErrorFrequencyAnalyzer().analyze(entries);
+        assertEquals(1, result.size());
+        assertEquals(3, result.get(0).getCount());
+        // First occurrence's original message is preserved
+        assertEquals("Connection  timeout", result.get(0).getMessage());
+    }
+
+    @Test
+    void differentServicesWithSameMessageAreSeparateBuckets() {
+        List<LogEntry> entries = List.of(
+                error("Connection timeout", "DatabaseService"),
+                error("Connection timeout", "AuthService")
+        );
+
+        List<ErrorFrequency> result = new ErrorFrequencyAnalyzer().analyze(entries);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void blankMessagesAreIgnored() {
+        List<LogEntry> entries = List.of(
+                error("", "Service"),
+                error("   ", "Service"),
+                error("Real error", "Service")
+        );
+
+        List<ErrorFrequency> result = new ErrorFrequencyAnalyzer().analyze(entries);
+        assertEquals(1, result.size());
+        assertEquals("Real error", result.get(0).getMessage());
+    }
+
     private static LogEntry error(String message, String service) {
         return LogEntry.builder()
                 .lineNumber(1)

@@ -125,6 +125,9 @@ function renderOverview(data) {
     document.getElementById('metricWarn').textContent = (data.levelCounts.WARN || 0).toLocaleString();
     document.getElementById('metricError').textContent = (data.levelCounts.ERROR || 0).toLocaleString();
     document.getElementById('metricFatal').textContent = (data.levelCounts.FATAL || 0).toLocaleString();
+    document.getElementById('metricDebug').textContent = (data.levelCounts.DEBUG || 0).toLocaleString();
+    document.getElementById('metricTrace').textContent = (data.levelCounts.TRACE || 0).toLocaleString();
+    document.getElementById('metricUnknown').textContent = (data.levelCounts.UNKNOWN || 0).toLocaleString();
     document.getElementById('metricIncidents').textContent = (data.incidents && data.incidents.length) || 0;
 }
 
@@ -135,7 +138,7 @@ function renderAnalytics(data) {
     const levels = ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'UNKNOWN'];
     const total = data.totalLines || 1;
 
-    // Bar chart
+    // Bar chart - Log Level Distribution
     const chartEl = document.getElementById('levelChart');
     chartEl.innerHTML = '';
     const maxCount = Math.max(...levels.map(l => levelCounts[l] || 0));
@@ -146,7 +149,11 @@ function renderAnalytics(data) {
         bar.className = 'metric-bar';
         bar.style.height = (maxCount > 0 ? (count / maxCount * 100) : 0) + '%';
         bar.title = level + ': ' + count + ' (' + pct.toFixed(1) + '%)';
-        bar.innerHTML = '<div class="bar-label">' + level + '</div><div class="bar-value">' + count.toLocaleString() + '</div>';
+        const color = getLevelColor(level);
+        bar.innerHTML =
+            '<div class="bar-fill" style="background-color:' + color + ';"></div>' +
+            '<div class="bar-label">' + escapeHtml(level) + '</div>' +
+            '<div class="bar-value">' + count.toLocaleString() + '</div>';
         chartEl.appendChild(bar);
     });
 
@@ -157,12 +164,11 @@ function renderAnalytics(data) {
         const count = levelCounts[level] || 0;
         const pct = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><span class="level-badge level-${level}">${level}</span></td>
-            <td>${count.toLocaleString()}</td>
-            <td>${pct}%</td>
-            <td><div class="distribution-bar"><div class="distribution-fill" style="width:${pct}%;background-color:getLevelColor('${level}');"></div></div></td>
-        `;
+        row.innerHTML =
+            '<td><span class="level-badge level-' + escapeHtml(level) + '">' + escapeHtml(level) + '</span></td>' +
+            '<td>' + count.toLocaleString() + '</td>' +
+            '<td>' + pct + '%</td>' +
+            '<td><div class="distribution-bar"><div class="distribution-fill" style="width:' + pct + '%;background-color:' + getLevelColor(level) + ';"></div></div></td>';
         tbody.appendChild(row);
     });
 
@@ -191,7 +197,9 @@ function renderDailyChart(dailyStats) {
         bar.className = 'daily-bar';
         bar.style.height = ((stat.errors / maxErrors) * 100) + '%';
         bar.title = stat.date + ': ' + stat.errors + ' errors, ' + stat.warnings + ' warnings';
-        bar.innerHTML = '<div class="bar-label">' + stat.date + '</div>';
+        bar.innerHTML =
+            '<div class="bar-fill" style="background-color:var(--accent);"></div>' +
+            '<div class="bar-label">' + escapeHtml(stat.date) + '</div>';
         chartEl.appendChild(bar);
     });
 }

@@ -133,4 +133,73 @@ class ReportGeneratorTest {
         assertThrows(ReportGenerationException.class,
                 () -> generator.generate(sampleData(), outputDir.resolve("missing")));
     }
+
+    @Test
+    void csvEscapesUnicodeAndNewlines() throws Exception {
+        ReportData data = new ReportData(
+                "unicode-测试.log",
+                LocalDateTime.now(),
+                10, 10, 0,
+                Map.of(LogLevel.INFO, 10),
+                List.of(new ErrorFrequency("msg with newline\nand tab\there", "msg", "Svc", 1)),
+                List.of(),
+                List.of(),
+                5
+        );
+        new CsvReportGenerator().generate(data, outputDir);
+        String csv = Files.readString(outputDir.resolve("error_frequency_report.csv"));
+        // Newlines and commas should be quoted
+        assertTrue(csv.contains("newline"));
+    }
+
+    @Test
+    void textReportWithEmptyIncidents() throws Exception {
+        ReportData data = new ReportData(
+                "clean.log",
+                LocalDateTime.now(),
+                100, 100, 0,
+                Map.of(LogLevel.INFO, 100),
+                List.of(),
+                List.of(),
+                List.of(),
+                10
+        );
+        new TextReportGenerator().generate(data, outputDir);
+        String incident = Files.readString(outputDir.resolve("incident_report.txt"));
+        assertTrue(incident.contains("No potential incidents detected."));
+    }
+
+    @Test
+    void textReportWithEmptyErrors() throws Exception {
+        ReportData data = new ReportData(
+                "clean.log",
+                LocalDateTime.now(),
+                100, 100, 0,
+                Map.of(LogLevel.INFO, 100),
+                List.of(),
+                List.of(),
+                List.of(),
+                10
+        );
+        new TextReportGenerator().generate(data, outputDir);
+        String errorFreq = Files.readString(outputDir.resolve("error_frequency_report.txt"));
+        assertTrue(errorFreq.contains("No errors found."));
+    }
+
+    @Test
+    void csvReportWithEmptyDailyStats() throws Exception {
+        ReportData data = new ReportData(
+                "empty.log",
+                LocalDateTime.now(),
+                0, 0, 0,
+                Map.of(),
+                List.of(),
+                List.of(),
+                List.of(),
+                5
+        );
+        new CsvReportGenerator().generate(data, outputDir);
+        String daily = Files.readString(outputDir.resolve("daily_statistics_report.csv"));
+        assertTrue(daily.contains("Date,Errors,Warnings,Total"));
+    }
 }

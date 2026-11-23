@@ -8,35 +8,30 @@ import com.logsentinel.report.ReportGenerationException;
 import com.logsentinel.report.TextReportGenerator;
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Handles GET /api/reports/download?type=txt|csv.
  * Generates a report from the latest analysis session and returns it as a
  * downloadable file. Reuses the existing TextReportGenerator and
  * CsvReportGenerator.
+ * Reports are generated in a unique per-request temporary directory and
+ * cleaned up immediately after the content is read, so no files persist on
+ * disk.
  */
 public class ReportDownloadHandler extends ApiHandler {
-
-    private static final String REPORT_DIR = System.getProperty("java.io.tmpdir")
-            + "/logsentinel-reports";
 
     private final DashboardStore store;
 
     public ReportDownloadHandler(DashboardStore store) {
         this.store = store;
-        try {
-            Files.createDirectories(Path.of(REPORT_DIR));
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot create report directory", e);
-        }
     }
 
     @Override
@@ -82,22 +77,33 @@ public class ReportDownloadHandler extends ApiHandler {
             byte[] content;
             String contentType;
 
-            if ("txt".equals(type)) {
-                fileName = "logsentinel-report.txt";
-                contentType = "text/plain; charset=utf-8";
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                new TextReportGenerator().generate(
-                        data, Path.of(REPORT_DIR));
-                // Read back the generated file
-                Path generated = Path.of(REPORT_DIR, "summary_report.txt");
-                content = Files.readAllBytes(generated);
-            } else {
-                fileName = "logsentinel-report.csv";
-                contentType = "text/csv; charset=utf-8";
-                new CsvReportGenerator().generate(
-                        data, Path.of(REPORT_DIR));
-                Path generated = Path.of(REPORT_DIR, "summary_report.csv");
-                content = Files.readAllBytes(generated);
+            Path tempDir = Path.of(System.getProperty("java.io.tmpdir"),
+                    "logsentinel-reports-" + UUID.randomUUID().toString());
+            Files.createDirectories(tempDir);
+            try {
+                if ("txt".equals(type)) {
+                    fileName = "logsentinel-report.txt";
+                    contentType = "text/plain; charset=utf-8";
+                    new TextReportGenerator().generate(data, tempDir);
+                    content = Files.readAllBytes(tempDir.resolve("summary_report.txt"));
+                } else {
+                    fileName = "logsentinel-report.csv";
+                    contentType = "text/csv; charset=utf-8";
+                    new CsvReportGenerator().generate(data, tempDir);
+                    content = Files.readAllBytes(tempDir.resolve("summary_report.csv"));
+                }
+            } finally {
+                try {
+                    Files.walk(tempDir)
+                            .sorted(Comparator.reverseOrder())
+                            .forEach(p -> {
+                                try {
+                                    Files.delete(p);
+                                } catch (IOException ignored) {
+                                }
+                            });
+                } catch (IOException ignored) {
+                }
             }
 
             exchange.getResponseHeaders().set(

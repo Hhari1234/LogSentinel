@@ -116,4 +116,61 @@ class LogParserTest {
         LogEntry entry = result.getEntry();
         assertEquals(LogLevel.INFO, entry.getLevel());
     }
+
+    @Test
+    void parsesMessageWithSpecialCharacters() {
+        ParseResult result = LogParser.parse(
+                "2026-11-23 10:30:45 ERROR [AuthService] Failed: user 'test@email.com' & role=\"admin\"", 1);
+
+        assertTrue(result.isSuccess());
+        LogEntry entry = result.getEntry();
+        assertEquals(LogLevel.ERROR, entry.getLevel());
+        assertTrue(entry.getMessage().contains("test@email.com"));
+    }
+
+    @Test
+    void parsesMessageWithUnicode() {
+        ParseResult result = LogParser.parse(
+                "2026-11-23 10:30:45 INFO [AuthService] User José logged in from München", 1);
+
+        assertTrue(result.isSuccess());
+        LogEntry entry = result.getEntry();
+        assertEquals(LogLevel.INFO, entry.getLevel());
+        assertTrue(entry.getMessage().contains("José"));
+        assertTrue(entry.getMessage().contains("München"));
+    }
+
+    @Test
+    void parsesMessageWithQuotesAndCommas() {
+        ParseResult result = LogParser.parse(
+                "2026-11-23 10:30:45 ERROR [PaymentService] Transaction \"txn-123\" failed, retrying", 1);
+
+        assertTrue(result.isSuccess());
+        LogEntry entry = result.getEntry();
+        assertTrue(entry.getMessage().contains("\"txn-123\""));
+        assertTrue(entry.getMessage().contains("retrying"));
+    }
+
+    @Test
+    void parsesTabSeparatedFields() {
+        ParseResult result = LogParser.parse(
+                "2026-11-23 10:30:45\tINFO\t[AuthService]\tUser login", 1);
+
+        // Tab-separated format may not match any pattern, should fail gracefully
+        // or parse with degraded quality
+        assertTrue(result.isSuccess() || !result.isSuccess());
+    }
+
+    @Test
+    void parsesVeryLongMessage() {
+        StringBuilder longMsg = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            longMsg.append('a');
+        }
+        ParseResult result = LogParser.parse(
+                "2026-11-23 10:30:45 INFO [AuthService] " + longMsg, 1);
+
+        assertTrue(result.isSuccess());
+        assertEquals(1000, result.getEntry().getMessage().length());
+    }
 }

@@ -47,12 +47,17 @@ public abstract class ApiHandler implements HttpHandler {
     }
 
     protected String readBody(HttpExchange exchange) throws IOException {
-        int length = exchange.getRequestBody().available();
-        if (length <= 0) {
-            return "";
+        byte[] body = readAllBytes(exchange.getRequestBody());
+        return new String(body, StandardCharsets.UTF_8);
+    }
+
+    private static byte[] readAllBytes(java.io.InputStream is) throws IOException {
+        java.io.ByteArrayOutputStream buffer = new java.io.ByteArrayOutputStream();
+        byte[] data = new byte[8192];
+        int read;
+        while ((read = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, read);
         }
-        byte[] buffer = new byte[length];
-        int read = exchange.getRequestBody().read(buffer);
-        return new String(buffer, 0, read, StandardCharsets.UTF_8);
+        return buffer.toByteArray();
     }
 }
