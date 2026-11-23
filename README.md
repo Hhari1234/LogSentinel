@@ -95,43 +95,113 @@ The application runs locally without internet access after dependencies are down
 
 ## Architecture
 
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+    %% User Interfaces
+    CLI["CLI: Interactive Menu"]:::ui
+    Browser["Browser: Dashboard"]:::ui
+
+    %% Entry Points
+    Main["Main.java<br/>CLI + Dashboard entry"]:::entry
+
+    %% Web Stack
+    DS["DashboardServer<br/>Java built-in HttpServer"]:::server
+    Store["DashboardStore<br/>In-memory session holder"]:::store
+    Handler["DashboardHandler<br/>REST API endpoints"]:::server
+    Upload["FileUploadHandler<br/>Multipart upload"]:::server
+    Report["ReportDownloadHandler<br/>TXT/CSV download"]:::server
+    Static["StaticResourceHandler<br/>HTML/CSS/JS"]:::server
+
+    %% Analysis Engine
+    Service["LogAnalysisService<br/>Orchestrates analysis"]:::engine
+    Reader["LogFileReader<br/>Line-by-line streaming"]:::engine
+    Parser["LogParser<br/>Regex-based parsing"]:::engine
+    Stats["LogStatisticsAnalyzer<br/>Level counts, percentages"]:::engine
+    ErrorFreq["ErrorFrequencyAnalyzer<br/>Top-N frequent errors"]:::engine
+    DailyStats["DailyStatisticsAnalyzer<br/>Per-day grouping"]:::engine
+    Search["LogSearchService<br/>Keyword/level/service search"]:::engine
+    Incident["IncidentDetector<br/>Repeated-error detection"]:::engine
+    Parallel["ParallelLogProcessor<br/>ExecutorService batches"]:::engine
+    Sequential["SequentialLogProcessor<br/>Single-threaded"]:::engine
+    ReportGen["ReportGenerator<br/>TXT/CSV generation"]:::engine
+
+    %% Models
+    Entry["LogEntry<br/>Immutable model"]:::model
+    StatsModel["LogStatistics<br/>Aggregate counts"]:::model
+    Session["AnalysisSession<br/>Full analysis result"]:::model
+    ReportData["ReportData<br/>Report payload"]:::model
+
+    %% Output
+    CLIout["Console output"]
+    Browserout["Browser dashboard"]
+    Reports["TXT / CSV reports"]
+
+    %% Connections - CLI
+    CLI --> Main
+    Main -->|analyze| Service
+    Main -->|benchmark| PB["PerformanceBenchmark"]:::engine
+    Service --> Reader
+    Reader --> Parser
+    Parser --> Entry
+    Service --> Stats
+    Service --> ErrorFreq
+    Service --> DailyStats
+    Service --> Incident
+    Service --> Search
+    Service --> Parallel
+    Service --> Sequential
+    Service --> ReportGen
+    Stats --> StatsModel
+    ErrorFreq --> Entry
+    Incident --> Session
+    ReportGen --> ReportData
+    ReportData --> Reports
+    Session --> CLIout
+    Parallel --> Entry
+    Sequential --> Entry
+
+    %% Connections - Web
+    Browser --> DS
+    DS --> Store
+    DS --> Handler
+    DS --> Upload
+    DS --> Report
+    DS --> Static
+    Handler --> Store
+    Upload --> Service
+    Upload --> Reader
+    Upload --> Parser
+    Report --> ReportGen
+    Store --> Session
+
+    %% Styling
+    classDef ui fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef entry fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef server fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef store fill:#fff8e1,stroke:#f9a825,stroke-width:2px
+    classDef engine fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef model fill:#eceff1,stroke:#37474f,stroke-width:2px
 ```
-LogSentinel/
-|-- pom.xml
-|-- .gitignore
-|-- README.md
-|-- src/
-|   |-- main/java/com/logsentinel/
-|   |   |-- Main.java                    # CLI + dashboard entry point
-|   |   |-- model/                       # Immutable data models
-|   |   |   |-- LogEntry, LogLevel, LogStatistics, ErrorFrequency,
-|   |   |   |-- DailyStat, SearchResult, ProcessingResult, AnalysisSession,
-|   |   |   |-- ReportData
-|   |   |-- parser/                      # LogParser, ParseResult
-|   |   |-- processor/                   # LogProcessor, LogFileReader,
-|   |   |   |-- SequentialLogProcessor, ParallelLogProcessor
-|   |   |-- analyzer/                    # LogStatisticsAnalyzer,
-|   |   |   |-- ErrorFrequencyAnalyzer, DailyStatisticsAnalyzer, LogSearchService
-|   |   |-- incident/                    # IncidentDetector, Incident, IncidentSeverity
-|   |   |-- report/                      # ReportGenerator, ReportData,
-|   |   |   |-- ReportGenerationException, TextReportGenerator, CsvReportGenerator
-|   |   |-- benchmark/                   # LogGenerator, PerformanceBenchmark
-|   |   |-- service/                     # LogAnalysisService
-|   |   |-- exception/                   # LogFileException, ReportGenerationException
-|   |   |-- web/                         # Web dashboard
-|   |   |   |-- DashboardServer, DashboardStore, DashboardHandler,
-|   |   |   |-- FileUploadHandler, ReportDownloadHandler, StaticResourceHandler, JsonUtil
-|   |   |-- resources/static/            # Frontend assets
-|   |   |   |-- index.html, css/style.css, js/app.js
-|   |-- test/java/com/logsentinel/       # JUnit 5 tests (70 tests)
-|-- sample-logs/                         # Sample log files (*-demo.log tracked)
-|-- docs/
-|   |-- sample-reports/                  # Generated TXT and CSV reports
-|   |-- screenshots/                     # Dashboard screenshots (capture manually)
-|-- reports/                             # Generated reports (gitignored)
-|-- benchmarks/                          # Generated benchmark files (gitignored)
-|-- target/                              # Maven build output (gitignored)
+
+### Application Workflow
+
 ```
+1. User starts the application (CLI or --dashboard mode)
+2. For CLI: User selects an option from the interactive menu
+3. For Dashboard: Browser loads http://localhost:8080
+4. User uploads a .log or .txt file (max 50 MB)
+5. LogFileReader streams the file line-by-line
+6. LogParser parses each line: timestamp, level, service, thread, message
+7. Analysis engine computes: level counts, error frequency, daily stats, incidents
+8. Results are stored in AnalysisSession (in-memory)
+9. Dashboard renders metrics, charts, tables; or CLI prints output
+10. User can download TXT/CSV reports or search/filter log entries
+```
+
+### Project Structure
+
 
 ### Key Design Decisions
 
