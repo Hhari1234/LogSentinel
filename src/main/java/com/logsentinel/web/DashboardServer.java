@@ -67,10 +67,14 @@ public final class DashboardServer {
     public void start() {
         server.start();
         System.out.println("========================================");
-        System.out.println("       LOGSENTINEL WEB DASHBOARD");
+        System.out.println("       LOGSENTINEL DASHBOARD");
         System.out.println("========================================");
-        System.out.println("Dashboard URL: http://localhost:" + port);
-        System.out.println("Press Ctrl+C to stop.");
+        System.out.println("Server status: RUNNING");
+        System.out.println("Port: " + port);
+        System.out.println("Dashboard: http://localhost:" + port);
+        System.out.println("API Health: http://localhost:" + port + "/api/health");
+        System.out.println();
+        System.out.println("Press Ctrl+C to stop the server.");
         System.out.println("========================================");
     }
 
