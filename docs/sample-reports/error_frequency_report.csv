@@ -1,0 +1,3 @@
+Rank,Error Message,Service,Occurrences
+1,"Connection timeout: database=primary, host=db-prod-01, port=5432",DatabaseService,5
+2,"Payment gateway unavailable: gateway=paypal, error_code=502",PaymentService,4

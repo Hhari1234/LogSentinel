@@ -43,4 +43,6 @@ Thumbs.db
 reports/*.txt
 reports/*.csv
 benchmarks/*.txt
+# Ignore large generated logs but track intentional demo samples
 sample-logs/*.log
+!sample-logs/*-demo.log

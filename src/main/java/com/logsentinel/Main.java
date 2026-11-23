@@ -14,6 +14,7 @@ import com.logsentinel.report.CsvReportGenerator;
 import com.logsentinel.report.ReportData;
 import com.logsentinel.report.TextReportGenerator;
 import com.logsentinel.service.LogAnalysisService;
+import com.logsentinel.web.DashboardServer;
 
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -23,6 +24,10 @@ import java.util.Scanner;
 
 /**
  * Command-line entry point for LogSentinel.
+ *
+ * Supports two modes:
+ *   - Default (no args): interactive CLI menu
+ *   - --dashboard: starts the web dashboard on http://localhost:8080
  */
 public final class Main {
 
@@ -33,6 +38,30 @@ public final class Main {
     private AnalysisSession currentSession;
 
     public static void main(String[] args) {
+        if (args.length > 0 && "--dashboard".equals(args[0])) {
+            int port = 8080;
+            for (int i = 1; i < args.length; i++) {
+                if ("--port".equals(args[i]) && i + 1 < args.length) {
+                    try {
+                        port = Integer.parseInt(args[i + 1]);
+                        i++;
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid port: " + args[i + 1]);
+                        System.exit(1);
+                    }
+                }
+            }
+            try {
+                DashboardServer server = DashboardServer.create(port);
+                server.start();
+                // Keep the main thread alive
+                Thread.currentThread().join();
+            } catch (Exception e) {
+                System.err.println("Failed to start dashboard: " + e.getMessage());
+                System.exit(1);
+            }
+            return;
+        }
         new Main().run();
     }
 

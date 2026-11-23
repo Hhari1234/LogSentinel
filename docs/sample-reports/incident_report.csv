@@ -1,0 +1,4 @@
+Incident ID,Service,Pattern,Occurrences,First Occurrence,Last Occurrence,Window (minutes),Severity,Type
+INC-0001,DatabaseService,"Connection timeout: database=primary, host=db-prod-01, port=5432",5,2026-11-23 11:03:01,2026-11-23 11:03:20,1,HIGH,POTENTIAL INCIDENT
+
+Note,These are pattern-based potential incidents, not confirmed root causes.

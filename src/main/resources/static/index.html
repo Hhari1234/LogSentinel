@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogSentinel – Intelligent Log Monitoring</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">L</div>
+                <div class="brand-text">
+                    <div class="brand-name">LogSentinel</div>
+                    <div class="brand-subtitle">Intelligent Log Monitoring</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-section="overview">
+                    <span class="nav-icon">&#128201;</span>
+                    <span class="nav-label">Overview</span>
+                </a>
+                <a href="#" class="nav-item" data-section="analytics">
+                    <span class="nav-icon">&#128208;</span>
+                    <span class="nav-label">Log Analytics</span>
+                </a>
+                <a href="#" class="nav-item" data-section="errors">
+                    <span class="nav-icon">&#128308;</span>
+                    <span class="nav-label">Error Monitoring</span>
+                </a>
+                <a href="#" class="nav-item" data-section="incidents">
+                    <span class="nav-icon">&#128679;</span>
+                    <span class="nav-label">Incidents</span>
+                </a>
+                <a href="#" class="nav-item" data-section="explorer">
+                    <span class="nav-icon">&#128269;</span>
+                    <span class="nav-label">Log Explorer</span>
+                </a>
+                <a href="#" class="nav-item" data-section="upload">
+                    <span class="nav-icon">&#128247;</span>
+                    <span class="nav-label">Upload Log</span>
+                </a>
+                <a href="#" class="nav-item" data-section="reports">
+                    <span class="nav-icon">&#128196;</span>
+                    <span class="nav-label">Reports</span>
+                </a>
+            </nav>
+            <div class="nav-footer">
+                <div class="status-indicator" id="backendStatus">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Connecting...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="pageTitle">Overview</h1>
+                <p id="pageSubtitle">Real-time log analysis and incident detection</p>
+            </header>
+
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Log Entries</div>
+                        <div class="metric-value" id="metricTotal">-</div>
+                        <div class="metric-subtext">Processed records</div>
+                    </div>
+                    <div class="metric-card level-card info-card">
+                        <div class="metric-label">INFO</div>
+                        <div class="metric-value" id="metricInfo">-</div>
+                        <div class="metric-subtext">Informational events</div>
+                    </div>
+                    <div class="metric-card level-card warn-card">
+                        <div class="metric-label">WARN</div>
+                        <div class="metric-value" id="metricWarn">-</div>
+                        <div class="metric-subtext">Warning events</div>
+                    </div>
+                    <div class="metric-card level-card error-card">
+                        <div class="metric-label">ERROR</div>
+                        <div class="metric-value" id="metricError">-</div>
+                        <div class="metric-subtext">Error events</div>
+                    </div>
+                    <div class="metric-card level-card fatal-card">
+                        <div class="metric-label">FATAL</div>
+                        <div class="metric-value" id="metricFatal">-</div>
+                        <div class="metric-subtext">Critical failures</div>
+                    </div>
+                    <div class="metric-card incident-card">
+                        <div class="metric-label">Detected Incidents</div>
+                        <div class="metric-value" id="metricIncidents">-</div>
+                        <div class="metric-subtext">Potential issues flagged</div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>About the Analysis</h3>
+                    <p>
+                        LogSentinel analyzes application log files and identifies errors,
+                        warnings, frequent issues, and repeated-error patterns that may
+                        indicate potential incidents. All metrics are computed from the
+                        most recently uploaded and analyzed log file.
+                    </p>
+                    <p><strong>Important:</strong> Detected incidents are pattern-based
+                        findings, not confirmed root causes. They indicate suspicious
+                        repetition that warrants investigation.</p>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="section-header">
+                    <h2>Log Level Analytics</h2>
+                    <p>Distribution of log levels and daily activity.</p>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-panel">
+                        <h3>Log Level Distribution</h3>
+                        <div class="chart-container" id="levelChart"></div>
+                    </div>
+                    <div class="chart-panel">
+                        <h3>Daily Activity</h3>
+                        <div class="chart-container" id="dailyChart"></div>
+                    </div>
+                </div>
+                <div class="level-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Level</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                                <th>Distribution</th>
+                            </tr>
+                        </thead>
+                        <tbody id="levelTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Errors Section -->
+            <section id="errors" class="content-section">
+                <div class="section-header">
+                    <h2>Error Monitoring</h2>
+                    <p>Most frequently occurring error messages.</p>
+                </div>
+                <div class="table-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Error Message</th>
+                                <th>Service</th>
+                                <th>Occurrences</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody id="errorTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="errorsEmpty" style="display:none;">
+                    <div class="empty-icon">&#128308;</div>
+                    <h3>No Errors Detected</h3>
+                    <p>The analyzed log file contains no ERROR-level entries.</p>
+                </div>
+            </section>
+
+            <!-- Incidents Section -->
+            <section id="incidents" class="content-section">
+                <div class="section-header">
+                    <h2>Incident Detection</h2>
+                    <p>Potential incidents identified from repeated error patterns.</p>
+                </div>
+                <div class="incident-note">
+                    <strong>Note:</strong> Incidents are detected based on repeated
+                    error patterns within a configurable time window (default: 5+ similar
+                    errors within 1 minute). These are <em>potential</em> issues, not
+                    confirmed root causes.
+                </div>
+                <div class="table-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Incident ID</th>
+                                <th>Service</th>
+                                <th>Pattern</th>
+                                <th>Occurrences</th>
+                                <th>First Occurrence</th>
+                                <th>Last Occurrence</th>
+                                <th>Severity</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidentTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="incidentsEmpty" style="display:none;">
+                    <div class="empty-icon">&#128679;</div>
+                    <h3>No Incidents Detected</h3>
+                    <p>No repeated error patterns met the incident detection threshold.</p>
+                </div>
+            </section>
+
+            <!-- Log Explorer Section -->
+            <section id="explorer" class="content-section">
+                <div class="section-header">
+                    <h2>Log Explorer</h2>
+                    <p>Search and filter parsed log entries.</p>
+                </div>
+                <div class="explorer-controls">
+                    <div class="filter-group">
+                        <label>Level</label>
+                        <select id="levelFilter">
+                            <option value="">All Levels</option>
+                            <option value="TRACE">TRACE</option>
+                            <option value="DEBUG">DEBUG</option>
+                            <option value="INFO">INFO</option>
+                            <option value="WARN">WARN</option>
+                            <option value="ERROR">ERROR</option>
+                            <option value="FATAL">FATAL</option>
+                            <option value="UNKNOWN">UNKNOWN</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Keyword</label>
+                        <input type="text" id="keywordFilter" placeholder="Search message or service...">
+                    </div>
+                    <button class="btn btn-secondary" id="clearFilters">Clear Filters</button>
+                </div>
+                <div class="table-panel">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Line</th>
+                                <th>Timestamp</th>
+                                <th>Level</th>
+                                <th>Service</th>
+                                <th>Thread</th>
+                                <th>Message</th>
+                                <th>Exception</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="logCount">Showing <span id="logShown">0</span> of <span id="logTotal">0</span> entries</div>
+                <div class="empty-state" id="logsEmpty" style="display:none;">
+                    <div class="empty-icon">&#128269;</div>
+                    <h3>No Matching Logs</h3>
+                    <p>No log entries match the current filters.</p>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section id="upload" class="content-section">
+                <div class="section-header">
+                    <h2>Upload Log File</h2>
+                    <p>Upload a .log or .txt file for analysis.</p>
+                </div>
+                <div class="upload-panel">
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="upload-icon">&#128247;</div>
+                        <div class="upload-text">
+                            <strong>Drag and drop a log file here</strong>
+                            <p>or click to browse</p>
+                            <p class="upload-hint">Supports .log and .txt files (max 50 MB)</p>
+                        </div>
+                        <input type="file" id="fileInput" accept=".log,.txt" style="display:none;">
+                    </div>
+                    <div class="upload-result" id="uploadResult" style="display:none;"></div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="content-section">
+                <div class="section-header">
+                    <h2>Reports</h2>
+                    <p>Download analysis reports in text or CSV format.</p>
+                </div>
+                <div class="reports-panel">
+                    <div class="report-card">
+                        <h3>Summary Report (TXT)</h3>
+                        <p>Human-readable summary with log-level counts, processing duration, and key metrics.</p>
+                        <button class="btn btn-primary" onclick="downloadReport('txt')">Download TXT Report</button>
+                    </div>
+                    <div class="report-card">
+                        <h3>Summary Report (CSV)</h3>
+                        <p>Machine-readable CSV format suitable for spreadsheets and further analysis.</p>
+                        <button class="btn btn-primary" onclick="downloadReport('csv')">Download CSV Report</button>
+                    </div>
+                </div>
+                <div id="reportMessage" style="margin-top:1rem;"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

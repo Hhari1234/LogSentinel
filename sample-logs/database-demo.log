@@ -1,0 +1,30 @@
+2026-11-23 10:00:01 INFO [DatabaseService] Database service started
+2026-11-23 10:00:05 INFO [DatabaseService] Connection pool initialized: size=20, host=db-prod-01
+2026-11-23 10:00:10 DEBUG [DatabaseService] Running migration: version=20261123_001
+2026-11-23 10:00:15 INFO [DatabaseService] Migration completed: version=20261123_001
+2026-11-23 10:01:01 INFO [DatabaseService] Query executed: query=SELECT * FROM users, duration=12ms
+2026-11-23 10:01:05 INFO [DatabaseService] Query executed: query=SELECT * FROM orders, duration=8ms
+2026-11-23 10:02:01 WARN [DatabaseService] Slow query detected: query=SELECT * FROM order_items JOIN orders, duration=2.5s
+2026-11-23 10:02:05 WARN [DatabaseService] Connection pool near capacity: used=18, max=20
+2026-11-23 10:03:01 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:05 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:10 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:15 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:20 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:25 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:30 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:03:35 INFO [DatabaseService] Connection restored: database=primary, host=db-prod-01
+2026-11-23 10:04:01 WARN [DatabaseService] Replication lag detected: replica=db-replica-01, lag=45s
+2026-11-23 10:05:01 INFO [DatabaseService] Query executed: query=UPDATE inventory SET stock=stock-1, duration=15ms
+2026-11-23 10:05:05 INFO [DatabaseService] Query executed: query=INSERT INTO audit_log, duration=5ms
+2026-11-23 10:06:01 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:06:05 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:06:10 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:06:15 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:06:20 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 10:06:25 INFO [DatabaseService] Connection restored: database=primary, host=db-prod-01
+2026-11-23 10:07:01 WARN [DatabaseService] Disk usage high: host=db-prod-01, usage=87%
+2026-11-23 10:08:01 INFO [DatabaseService] Backup started: database=primary, type=full
+2026-11-23 10:08:30 INFO [DatabaseService] Backup completed: database=primary, duration=29s, size=2.4GB
+2026-11-23 10:09:01 INFO [DatabaseService] Index rebuilt: table=order_items, duration=120s
+2026-11-23 10:10:01 INFO [DatabaseService] Health check passed: status=healthy, connections=15/20

@@ -1,0 +1,37 @@
+2026-11-23 11:00:01 INFO [Application] Application server starting
+2026-11-23 11:00:05 INFO [Application] Loading configuration
+2026-11-23 11:00:10 INFO [Application] All services initialized
+2026-11-23 11:00:15 INFO [AuthService] User login: user_id=admin, ip=10.0.0.1
+2026-11-23 11:00:20 INFO [PaymentService] Payment service ready
+2026-11-23 11:00:25 INFO [OrderService] Order service ready
+2026-11-23 11:01:01 INFO [OrderService] Order created: order_id=ORD-2001, customer_id=6001
+2026-11-23 11:01:05 INFO [PaymentService] Payment processed: order_id=ORD-2001, amount=299.99
+2026-11-23 11:01:10 INFO [NotificationService] Email sent: order_id=ORD-2001
+2026-11-23 11:02:01 WARN [OrderService] Inventory low: product_id=PROD-900, remaining=2
+2026-11-23 11:02:05 WARN [DatabaseService] Slow query: query=SELECT * FROM analytics, duration=1.9s
+2026-11-23 11:03:01 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 11:03:05 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 11:03:10 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 11:03:15 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 11:03:20 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 11:03:25 INFO [DatabaseService] Connection restored: database=primary, host=db-prod-01
+2026-11-23 11:04:01 ERROR [PaymentService] Payment gateway unavailable: gateway=paypal, error_code=502
+2026-11-23 11:04:05 ERROR [PaymentService] Payment gateway unavailable: gateway=paypal, error_code=502
+2026-11-23 11:04:10 ERROR [PaymentService] Payment gateway unavailable: gateway=paypal, error_code=502
+2026-11-23 11:04:15 ERROR [PaymentService] Payment gateway unavailable: gateway=paypal, error_code=502
+2026-11-23 11:04:20 WARN [PaymentService] Circuit breaker opened: gateway=paypal
+2026-11-23 11:05:01 INFO [AuthService] Failed login attempt: user_id=unknown, ip=172.16.0.99
+2026-11-23 11:05:05 INFO [AuthService] Failed login attempt: user_id=unknown, ip=172.16.0.99
+2026-11-23 11:05:10 INFO [AuthService] Failed login attempt: user_id=unknown, ip=172.16.0.99
+2026-11-23 11:05:15 INFO [AuthService] Failed login attempt: user_id=unknown, ip=172.16.0.99
+2026-11-23 11:05:20 INFO [AuthService] Failed login attempt: user_id=unknown, ip=172.16.0.99
+2026-11-23 11:05:30 INFO [AuthService] Account locked: user_id=unknown, reason=brute_force_detected
+2026-11-23 11:06:01 FATAL [Application] Application crashed: OutOfMemoryError at com.logsentinel.app.Main.run(Main.java:234)
+2026-11-23 11:06:05 INFO [Application] Application restarting...
+2026-11-23 11:06:10 INFO [Application] Application restarted successfully
+2026-11-23 11:07:01 INFO [PaymentService] Payment gateway restored: gateway=paypal
+2026-11-23 11:07:05 INFO [PaymentService] Payment processed: order_id=ORD-2002, amount=59.99
+2026-11-23 11:08:01 INFO [OrderService] Order created: order_id=ORD-2002, customer_id=6002
+2026-11-23 11:08:05 INFO [NotificationService] Email sent: order_id=ORD-2002
+2026-11-23 11:09:01 DEBUG [Application] Garbage collection: duration=230ms, freed=512MB
+2026-11-23 11:09:05 INFO [Application] Health check passed: status=healthy, uptime=9m

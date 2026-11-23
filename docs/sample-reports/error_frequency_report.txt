@@ -1,0 +1,8 @@
+========================================
+       MOST FREQUENT ERRORS REPORT
+========================================
+
+1. Connection timeout: database=primary, host=db-prod-01, port=5432 – 5 occurrences
+   Service: DatabaseService
+2. Payment gateway unavailable: gateway=paypal, error_code=502 – 4 occurrences
+   Service: PaymentService

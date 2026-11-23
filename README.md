@@ -1,21 +1,19 @@
 # LogSentinel – Intelligent Java Log Analyzer & Incident Detection System
 
-A command-line Core Java application that reads application log files and analyzes them for errors, warnings, frequent issues, daily statistics, and repeated-error incidents.
+A command-line and web-based Core Java application that reads application log files and analyzes them for errors, warnings, frequent issues, daily statistics, and repeated-error incidents. Includes a browser-based monitoring dashboard for real-time log exploration.
 
 Built as a learning and interview-preparation project. No frameworks, no databases, no external dependencies — just Core Java.
-
-## Project Status
-
-Complete and verified. All 12 development stages implemented. The project compiles, runs, and passes 70 automated JUnit 5 tests.
 
 ```
 mvn clean test  -> 70 tests pass, BUILD SUCCESS
 mvn clean package -> BUILD SUCCESS, jar produced
 ```
 
-## Problem Statement
+---
 
-Developers and support engineers need to understand application log files without setting up a logging stack:
+## Project Overview
+
+LogSentinel helps developers and support engineers understand application log files without setting up a logging stack:
 
 - How many errors and warnings occurred?
 - Which errors happen most frequently?
@@ -24,20 +22,54 @@ Developers and support engineers need to understand application log files withou
 - Are errors repeating in suspicious patterns (possible incidents)?
 - Can I search logs by keyword, level, service, or date?
 
-LogSentinel answers these questions locally from `.log` and `.txt` files.
+LogSentinel answers these questions locally from `.log` and `.txt` files, with both a command-line interface and a browser-based dashboard.
 
-## Features
+---
 
-1. **Log file reader** — streams `.log`/`.txt` files with `BufferedReader`, tracks valid/invalid line counts, handles missing files and permission errors.
-2. **Log parser** — regex-based parser for timestamp, level, service, thread, message, and exception name. Degrades gracefully on malformed lines.
-3. **Log level statistics** — counts TRACE, DEBUG, INFO, WARN, ERROR, FATAL, UNKNOWN with percentages.
-4. **Error frequency analysis** — top-N most frequent errors, sorted, with associated service.
-5. **Date and keyword analysis** — daily error/warning totals, busiest day, busiest one-hour error window, keyword/level/service/date search.
-6. **Repeated error & incident detection** — configurable threshold and time window; flags potential incidents (e.g. 5+ similar errors within 1 minute) with IDs, severity, first/last occurrence.
-7. **Multithreaded processing** — optional `ExecutorService`-based parallel mode with bounded batches; sequential vs parallel results verified to match.
-8. **Report generation** — summary, error frequency, daily statistics, and incident reports in text and CSV (with proper CSV escaping) under `reports/`.
-9. **Performance benchmarking** — generates deterministic sample files (1/10/50/100 MB) and measures sequential vs parallel throughput with `System.nanoTime()`.
-10. **Interactive CLI menu** — validated input, readable aligned output, clean exit.
+## Dashboard Preview
+
+LogSentinel includes a dark-themed, browser-based monitoring dashboard accessible at `http://localhost:8080` when started in dashboard mode. The dashboard reuses the same Core Java analysis engine as the CLI.
+
+**Dashboard sections:**
+
+| Section | Description |
+|---------|-------------|
+| Overview | Metric cards for total entries, log-level counts, and detected incidents |
+| Log Analytics | Log level distribution charts and daily activity statistics |
+| Error Monitoring | Most frequent errors ranked by occurrence count |
+| Incident Detection | Potential incidents from repeated error patterns |
+| Log Explorer | Searchable, filterable table of all parsed log entries |
+| Upload Log | Drag-and-drop file upload for analysis |
+| Reports | Download TXT and CSV analysis reports |
+
+**Screenshots**
+
+Genuine screenshots of the running dashboard are captured in `docs/screenshots/`. To capture them yourself:
+
+1. Start the dashboard: `java -cp target/classes com.logsentinel.web.DashboardServer`
+2. Upload a sample log file via the dashboard
+3. Take screenshots at `http://localhost:8080` for each section
+
+> **Note:** Automated browser screenshot capture was not available in this build environment. Screenshots should be captured manually by running the application and using your OS screenshot tool.
+
+---
+
+## Key Features
+
+1. **Log file reader** — streams `.log`/`.txt` files with `BufferedReader`, tracks valid/invalid line counts, handles missing files and permission errors
+2. **Log parser** — regex-based parser for timestamp, level, service, thread, message, and exception name. Degrades gracefully on malformed lines
+3. **Log level statistics** — counts TRACE, DEBUG, INFO, WARN, ERROR, FATAL, UNKNOWN with percentages
+4. **Error frequency analysis** — top-N most frequent errors, sorted, with associated service
+5. **Date and keyword analysis** — daily error/warning totals, busiest day, busiest one-hour error window, keyword/level/service/date search
+6. **Repeated error & incident detection** — configurable threshold and time window; flags potential incidents (e.g. 5+ similar errors within 1 minute) with IDs, severity, first/last occurrence
+7. **Multithreaded processing** — optional `ExecutorService`-based parallel mode with bounded batches; sequential vs parallel results verified to match
+8. **Report generation** — summary, error frequency, daily statistics, and incident reports in text and CSV (with proper CSV escaping)
+9. **Performance benchmarking** — generates deterministic sample files and measures sequential vs parallel throughput with `System.nanoTime()`
+10. **Interactive CLI menu** — validated input, readable aligned output, clean exit
+11. **Web dashboard** — browser-based monitoring interface using built-in `HttpServer`, REST API, vanilla HTML/CSS/JS frontend
+12. **File upload** — drag-and-drop log file upload via the dashboard with analysis results displayed immediately
+
+---
 
 ## Technology Stack
 
@@ -48,47 +80,20 @@ LogSentinel answers these questions locally from `.log` and `.txt` files.
 - Java Streams API & Lambda Expressions
 - Java Date and Time API (`java.time`)
 - Multithreading & `ExecutorService`
+- Java built-in `HttpServer` (web dashboard, no external framework)
 - Exception Handling (custom exceptions where they add clarity)
-- Java Serialization-friendly immutable models
+- Immutable data models
 - JUnit 5 (testing only)
 - Maven (build tool)
+- HTML5 / CSS3 / Vanilla JavaScript (dashboard frontend)
 
-**Not used:** Spring, Hibernate, JPA, MySQL, PostgreSQL, MongoDB, React, Angular, Node.js, Python, external logging frameworks, cloud services, external APIs, paid libraries.
+**Not used:** Spring, Spring Boot, Hibernate, JPA, MySQL, PostgreSQL, MongoDB, React, Angular, Node.js, Python, external logging frameworks, cloud services, external APIs, paid libraries.
 
 The application runs locally without internet access after dependencies are downloaded.
 
+---
+
 ## Architecture
-
-Package structure under `src/main/java/com/logsentinel/`:
-
-```
-model/        Immutable data models (LogEntry, LogLevel, LogStatistics,
-              ErrorFrequency, DailyStat, SearchResult, Incident,
-              IncidentSeverity, ProcessingResult, AnalysisSession, ReportData)
-parser/       LogParser, ParseResult
-processor/    LogProcessor (interface), LogFileReader, SequentialLogProcessor,
-              ParallelLogProcessor
-analyzer/     LogStatisticsAnalyzer, ErrorFrequencyAnalyzer,
-              DailyStatisticsAnalyzer, LogSearchService
-incident/     IncidentDetector, Incident, IncidentSeverity
-report/       ReportGenerator (interface), ReportData, ReportGenerationException,
-              TextReportGenerator, CsvReportGenerator
-benchmark/    LogGenerator, PerformanceBenchmark
-service/      LogAnalysisService (coordinates reading + analysis)
-exception/    LogFileException, ReportGenerationException
-Main.java     Command-line menu entry point
-```
-
-### Key design decisions
-
-- **Immutable models**: `LogEntry`, `LogStatistics`, `ErrorFrequency`, `DailyStat`, `Incident` are immutable where practical — safer to reason about and share.
-- **No static mutable state**: Incident IDs are generated by an instance-level counter in `IncidentDetector`, not a static field.
-- **Streaming file read**: `LogFileReader` reads line-by-line; it never loads the whole file into memory. `ParallelLogProcessor` uses bounded batches (default 1000 lines) so memory stays flat.
-- **No arbitrary file splitting**: parallel processing batches complete lines; line numbers are preserved; aggregation happens after all workers finish (no shared mutable state during parsing, so no race conditions).
-- **Parallel is optional**: benchmark results show it is not always faster (small files suffer thread-coordination overhead). Results match between sequential and parallel.
-- **Incidents are potential, not confirmed**: the tool flags suspicious repetition only; it does not claim to identify root causes.
-
-## Folder Structure
 
 ```
 LogSentinel/
@@ -96,48 +101,73 @@ LogSentinel/
 |-- .gitignore
 |-- README.md
 |-- src/
-|   |-- main/java/com/logsentinel/  (all application code)
-|   |-- test/java/com/logsentinel/   (JUnit 5 tests)
-|   |-- main/resources/
-|-- sample-logs/     sample application.log (1,005 records)
-|-- reports/         generated reports (gitignored)
-|-- benchmarks/      generated benchmark files (gitignored)
-|-- target/          Maven build output (gitignored)
+|   |-- main/java/com/logsentinel/
+|   |   |-- Main.java                    # CLI + dashboard entry point
+|   |   |-- model/                       # Immutable data models
+|   |   |   |-- LogEntry, LogLevel, LogStatistics, ErrorFrequency,
+|   |   |   |-- DailyStat, SearchResult, ProcessingResult, AnalysisSession,
+|   |   |   |-- ReportData
+|   |   |-- parser/                      # LogParser, ParseResult
+|   |   |-- processor/                   # LogProcessor, LogFileReader,
+|   |   |   |-- SequentialLogProcessor, ParallelLogProcessor
+|   |   |-- analyzer/                    # LogStatisticsAnalyzer,
+|   |   |   |-- ErrorFrequencyAnalyzer, DailyStatisticsAnalyzer, LogSearchService
+|   |   |-- incident/                    # IncidentDetector, Incident, IncidentSeverity
+|   |   |-- report/                      # ReportGenerator, ReportData,
+|   |   |   |-- ReportGenerationException, TextReportGenerator, CsvReportGenerator
+|   |   |-- benchmark/                   # LogGenerator, PerformanceBenchmark
+|   |   |-- service/                     # LogAnalysisService
+|   |   |-- exception/                   # LogFileException, ReportGenerationException
+|   |   |-- web/                         # Web dashboard
+|   |   |   |-- DashboardServer, DashboardStore, DashboardHandler,
+|   |   |   |-- FileUploadHandler, ReportDownloadHandler, StaticResourceHandler, JsonUtil
+|   |   |-- resources/static/            # Frontend assets
+|   |   |   |-- index.html, css/style.css, js/app.js
+|   |-- test/java/com/logsentinel/       # JUnit 5 tests (70 tests)
+|-- sample-logs/                         # Sample log files (*-demo.log tracked)
+|-- docs/
+|   |-- sample-reports/                  # Generated TXT and CSV reports
+|   |-- screenshots/                     # Dashboard screenshots (capture manually)
+|-- reports/                             # Generated reports (gitignored)
+|-- benchmarks/                          # Generated benchmark files (gitignored)
+|-- target/                              # Maven build output (gitignored)
 ```
 
-## Prerequisites
+### Key Design Decisions
 
-- Java 17 or later (JDK) — project targets Java 17 bytecode
+- **Immutable models**: `LogEntry`, `LogStatistics`, `ErrorFrequency`, `DailyStat`, `Incident` are immutable
+- **No static mutable state**: Incident IDs generated by instance-level counter in `IncidentDetector`
+- **Streaming file read**: `LogFileReader` reads line-by-line; never loads the whole file into memory
+- **No arbitrary file splitting**: parallel processing batches complete lines; aggregation after workers finish (no race conditions)
+- **Dashboard state**: `DashboardStore` holds the latest `AnalysisSession` in memory with synchronized access
+- **Incidents are potential, not confirmed**: the tool flags suspicious repetition only; it does not claim to identify root causes
+
+---
+
+## Installation Requirements
+
+- Java 17 or later (JDK)
 - Apache Maven 3.x
 
-## Build
+---
+
+## How to Run the CLI
 
 ```powershell
 cd C:\LogSentinel
 mvn clean compile
-```
-
-## Run
-
-```powershell
-cd C:\LogSentinel
-mvn -q exec:java -Dexec.mainClass="com.logsentinel.Main"
-```
-
-Or run the compiled classes directly:
-
-```powershell
-cd C:\LogSentinel
 java -cp target/classes com.logsentinel.Main
 ```
 
-### Example CLI session
+Or using Maven:
+
+```powershell
+mvn -q exec:java -Dexec.mainClass="com.logsentinel.Main"
+```
+
+The CLI displays an interactive menu:
 
 ```
-========================================
-             LOGSENTINEL
-     Intelligent Log Analyzer
-========================================
 1. Analyze a log file
 2. View log level statistics
 3. Find most frequent errors
@@ -147,24 +177,106 @@ java -cp target/classes com.logsentinel.Main
 7. Generate analysis reports
 8. Run performance benchmark
 9. Exit
-
-Enter your choice: 1
-Enter log file path (.log or .txt): C:\LogSentinel\sample-logs\application.log
-Use parallel processing? (y/n): n
-
-ANALYSIS COMPLETE
------------------
-File: application.log
-Total lines: 1005
-Valid entries: 1003
-Invalid entries: 2
-Processing time (ms): 113
-
-Error count: 124
-Warning count: 134
-Detected potential incidents: 0
-Most frequent errors: 10
 ```
+
+---
+
+## How to Start the Web Dashboard
+
+```powershell
+cd C:\LogSentinel
+mvn clean package
+java -cp target/classes com.logsentinel.web.DashboardServer
+```
+
+Or with a custom port:
+
+```powershell
+java -cp target/classes com.logsentinel.web.DashboardServer --port 9090
+```
+
+Then open your browser to:
+
+```
+http://localhost:8080
+```
+
+The CLI and dashboard share the same analysis engine. The CLI is unchanged — `--dashboard` is an additional mode.
+
+---
+
+## How to Upload Log Files
+
+1. Start the dashboard server
+2. Open `http://localhost:8080` in your browser
+3. Navigate to the "Upload Log" section
+4. Drag and drop a `.log` or `.txt` file, or click to browse
+5. The file is analyzed immediately and results appear across all dashboard sections
+
+**Constraints:**
+- Supported extensions: `.log`, `.txt`
+- Maximum file size: 50 MB
+- Files are processed using the same streaming reader as the CLI (line-by-line, not loaded entirely into memory)
+
+---
+
+## How to Generate Reports
+
+Reports can be generated in two ways:
+
+**Via CLI (option 7):**
+```
+Enter reports output directory [reports/]: reports
+Reports generated in: reports
+```
+
+**Via Dashboard:**
+1. Upload a log file
+2. Navigate to the "Reports" section
+3. Click "Download TXT Report" or "Download CSV Report"
+
+Reports include: input file name, processing timestamp, total/valid/invalid lines, log-level counts, most frequent errors, daily statistics, detected incidents, and processing duration.
+
+Sample reports are in `docs/sample-reports/`.
+
+---
+
+## Sample Log Data
+
+Four sample log files are in `sample-logs/`:
+
+| File | Description |
+|------|-------------|
+| `application-demo.log` | General application logs with all log levels |
+| `authentication-demo.log` | Auth-focused logs with failed logins and account lockouts |
+| `database-demo.log` | Database-focused logs with connection timeouts and slow queries |
+| `mixed-severity-demo.log` | Mixed severity with repeated errors, FATAL, and recovery messages |
+
+All samples follow the parser's supported format:
+
+```
+2026-11-23 10:30:45 INFO [AuthService] User login successful
+2026-11-23 10:31:12 WARN [PaymentService] Payment response delayed
+2026-11-23 10:32:01 ERROR [DatabaseService] Connection timeout
+```
+
+---
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `GET /api/health` | GET | Service health check |
+| `GET /api/dashboard` | GET | Full dashboard data (levels, daily stats, errors, incidents) |
+| `GET /api/logs` | GET | Log entries (query params: `level`, `keyword`) |
+| `GET /api/errors` | GET | Most frequent errors |
+| `GET /api/incidents` | GET | Detected incidents |
+| `POST /api/upload` | POST | Upload and analyze a log file (multipart/form-data) |
+| `GET /api/reports/download?type=txt\|csv` | GET | Download analysis report |
+
+All API responses are JSON.
+
+---
 
 ## Testing
 
@@ -177,7 +289,7 @@ mvn clean test
 
 Result: **70 tests, 0 failures, BUILD SUCCESS.**
 
-Tests cover valid/invalid parsing, missing/empty files, level counting, error frequency, date grouping, keyword search, incident detection, time-window boundaries, sequential/parallel consistency, report generation, and CSV escaping.
+Tests cover: valid/invalid parsing, missing/empty files, level counting, error frequency, date grouping, keyword search, incident detection, time-window boundaries, sequential/parallel consistency, report generation, CSV escaping, and dashboard API.
 
 Package the jar:
 
@@ -185,124 +297,60 @@ Package the jar:
 mvn clean package
 ```
 
+---
+
 ## Performance Benchmarking
 
-Run the benchmark (generates 1/10/50/100 MB sample files under `benchmarks/`):
+Run the benchmark:
 
 ```powershell
 cd C:\LogSentinel
 java -cp target/classes com.logsentinel.benchmark.PerformanceBenchmark
 ```
 
-Actual measured results on this machine:
+Generates deterministic sample files (1/10/50/100 MB) and measures sequential vs parallel throughput using `System.nanoTime()`. Results are actual measurements — no numbers are hardcoded or invented.
 
-| Size (MB) | Records   | Sequential | Parallel (4t) | Speedup | Match |
-|-----------|-----------|------------|---------------|---------|-------|
-| 1         | 16,870    | 85.72 ms   | 45.85 ms      | 1.87x   | true  |
-| 10        | 168,786   | 652.15 ms  | 290.11 ms     | 2.25x   | true  |
-| 50        | 843,944   | 5,453.68 ms| 2,994.86 ms   | 1.82x   | true  |
-| 100       | 1,687,862 | 5,661.33 ms| 2,715.77 ms   | 2.08x   | true  |
+---
 
-Notes:
-- These are actual measurements from `System.nanoTime()`, not hardcoded values.
-- Sequential and parallel record counts match exactly on every file.
-- Parallel is faster here, but not guaranteed — small files and thread-coordination overhead can make sequential competitive. Results depend on CPU, disk, memory, and OS.
+## Security Considerations
 
-## Sample Reports
+- File uploads are validated for extension (`.log`, `.txt` only) and size (max 50 MB)
+- Uploaded filenames are sanitized to prevent path traversal
+- Files are stored in a temporary directory and deleted after processing
+- No execution of uploaded file contents
+- No arbitrary filesystem access via API endpoints
+- The dashboard server binds to localhost only
 
-Reports are written to `reports/` in text and CSV formats.
+---
 
-**summary_report.txt** excerpt:
+## Current Limitations
 
-```
-========================================
-          LOGSENTINEL SUMMARY REPORT
-========================================
+- Incident detection requires valid timestamps; errors without timestamps are excluded from time-window analysis
+- Incident detection flags suspicious repetition only — not confirmed root causes
+- Dashboard stores the latest analysis session in memory; restarting the server clears it
+- Parallel processing uses bounded in-memory batches; extremely wide lines could increase per-batch memory
+- The dashboard is single-user (one session at a time)
+- Screenshots must be captured manually (no browser automation tool in this build environment)
 
-Input file: application.log
-Processing date: 2026-11-23 15:30:03
-Total lines: 1005
-Valid entries: 1003
-Invalid entries: 2
-Processing duration (ms): 120
-
-LOG-LEVEL COUNTS
-----------------
-TRACE   : 122
-DEBUG   : 126
-INFO    : 496
-WARN    : 134
-ERROR   : 124
-FATAL   : 0
-UNKNOWN : 1
-Error percentage: 12.36%
-Warning percentage: 13.36%
-```
-
-**error_frequency_report.txt** excerpt:
-
-```
-1. Cache miss IOException – 4 occurrences
-   Service: PaymentService
-2. Network unreachable NullPointerException – 4 occurrences
-   Service: OrderService
-...
-```
-
-**incident_report.txt**:
-
-```
-No potential incidents detected.
-
-Note: These are pattern-based potential incidents,
-not confirmed root causes.
-```
-
-## Known Limitations
-
-- Incident detection requires a valid timestamp; timestamped errors without timestamps are excluded from time-window analysis.
-- The parser supports the documented `yyyy-MM-dd HH:mm:ss LEVEL [service] [thread] message` format and simple variants; highly unusual formats may be treated as invalid.
-- Parallel processing uses bounded in-memory batches; extremely wide lines could increase per-batch memory.
-- Incident detection flags suspicious repetition only — it does not identify root causes.
+---
 
 ## Future Improvements
 
-- Export incidents to JSON.
-- Configurable parser format via a properties file.
-- Log file tailing / watch mode.
-- Compare multiple files side by side.
+- Export incidents to JSON
+- Configurable parser format via properties file
+- Multi-user dashboard with session isolation
+- Log file tailing / watch mode
+- Compare multiple files side by side
+- Email/webhook alerts for critical incidents
 
-## Class-by-Class Explanation
+---
 
-| Class | Responsibility |
-|-------|----------------|
-| `Main` | CLI menu, input validation, dispatches to service/report/benchmark. |
-| `LogAnalysisService` | Coordinates reading + all analyzers; returns `AnalysisSession`. |
-| `LogFileReader` | Streams `.log`/`.txt` with `BufferedReader`; counts valid/invalid lines. |
-| `LogParser` | Regex-based line parsing into `LogEntry`; graceful degradation. |
-| `LogEntry` | Immutable model of one parsed log entry. |
-| `LogLevel` | Enum TRACE..UNKNOWN with `fromString` lenient mapping. |
-| `LogStatisticsAnalyzer` | Counts levels, computes percentages. |
-| `LogStatistics` | Immutable level-count summary. |
-| `ErrorFrequencyAnalyzer` | Counts top-N frequent ERROR messages by service. |
-| `ErrorFrequency` | One error message + count + service. |
-| `DailyStatisticsAnalyzer` | Groups by date; daily errors/warnings; busiest day/hour. |
-| `DailyStat` | Per-day error/warning/total counts. |
-| `LogSearchService` | Keyword/level/service/date/case-insensitive search with line numbers. |
-| `SearchResult` | One search match with original line number. |
-| `IncidentDetector` | Configurable threshold/window repeated-error detection. |
-| `Incident` | Potential incident: ID, service, pattern, count, first/last, severity. |
-| `IncidentSeverity` | LOW/MEDIUM/HIGH/CRITICAL. |
-| `TextReportGenerator` / `CsvReportGenerator` | Text and CSV report writers with CSV escaping. |
-| `ReportData` / `ReportGenerator` | Report data container and generator interface. |
-| `LogProcessor` (interface) | Abstraction for sequential/parallel processing. |
-| `SequentialLogProcessor` | Single-threaded line-by-line processing. |
-| `ParallelLogProcessor` | `ExecutorService`-based bounded-batch parallel processing. |
-| `ProcessingResult` | Entries + summary counts from processing a file. |
-| `AnalysisSession` | Complete result of one analysis run. |
-| `LogGenerator` | Deterministic sample log file generator (fixed seed). |
-| `PerformanceBenchmark` | Measures sequential vs parallel throughput. |
-| `LogFileException` / `ReportGenerationException` | Custom checked exceptions. |
+## Author & Repository
+
+- GitHub: https://github.com/Hhari1234/LogSentinel
+- This is an educational log analysis and monitoring project, not a replacement for enterprise observability systems.
+
+---
 
 ## GitHub Upload
 
@@ -312,18 +360,8 @@ git init
 git add .
 git commit -m "Build LogSentinel Core Java log analyzer"
 git branch -M main
-git remote add origin YOUR_GITHUB_REPOSITORY_URL
+git remote add origin https://github.com/Hhari1234/LogSentinel.git
 git push -u origin main
 ```
 
-Replace `YOUR_GITHUB_REPOSITORY_URL` with your actual repository URL. Generated files under `reports/`, `benchmarks/`, `sample-logs/*.log`, and `target/` are gitignored and will not be committed.
-
-## Interview Preparation
-
-This project is designed to be defensible in interviews. Every class has a single, clear responsibility. Be prepared to explain:
-
-- Why `BufferedReader` + line-by-line reading matters for large files.
-- Why parallel processing batches complete lines and aggregates after workers finish.
-- Why incident detection is "potential" and not a root-cause claim.
-- How CSV escaping handles commas and quotes.
-- Why models are immutable and why there's no static mutable state.
+Generated files under `reports/`, `benchmarks/`, `target/`, and `docs/screenshots/` are handled by `.gitignore` — sample demo logs (`*-demo.log`) are tracked, but generated large logs are not.

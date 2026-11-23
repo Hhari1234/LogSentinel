@@ -1,0 +1,22 @@
+========================================
+          LOGSENTINEL SUMMARY REPORT
+========================================
+
+Input file: mixed-severity-demo.log
+Processing date: 2026-11-23 15:54:30
+Total lines: 37
+Valid entries: 37
+Invalid entries: 0
+Processing duration (ms): 49
+
+LOG-LEVEL COUNTS
+----------------
+TRACE   : 0
+DEBUG   : 1
+INFO    : 23
+WARN    : 3
+ERROR   : 9
+FATAL   : 1
+UNKNOWN : 0
+Error percentage: 24.32%
+Warning percentage: 8.11%

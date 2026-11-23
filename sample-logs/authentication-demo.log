@@ -1,0 +1,31 @@
+2026-11-23 09:00:01 INFO [AuthService] Authentication service started
+2026-11-23 09:00:05 INFO [AuthService] Loading JWT configuration
+2026-11-23 09:00:10 DEBUG [AuthService] Initializing LDAP connection
+2026-11-23 09:00:15 INFO [AuthService] LDAP connection established
+2026-11-23 09:01:01 INFO [AuthService] User login: user_id=alice, ip=10.0.1.10
+2026-11-23 09:01:05 INFO [AuthService] Password validated: user_id=alice
+2026-11-23 09:01:10 INFO [AuthService] Session created: user_id=alice, session_id=sess_001
+2026-11-23 09:01:20 INFO [AuthService] Token issued: user_id=alice, expiry=3600s
+2026-11-23 09:02:01 WARN [AuthService] Failed login attempt: user_id=bob, ip=10.0.1.20, reason=invalid_password
+2026-11-23 09:02:05 WARN [AuthService] Failed login attempt: user_id=bob, ip=10.0.1.20, reason=invalid_password
+2026-11-23 09:02:10 WARN [AuthService] Failed login attempt: user_id=bob, ip=10.0.1.20, reason=invalid_password
+2026-11-23 09:02:15 WARN [AuthService] Failed login attempt: user_id=bob, ip=10.0.1.20, reason=invalid_password
+2026-11-23 09:02:20 WARN [AuthService] Failed login attempt: user_id=bob, ip=10.0.1.20, reason=invalid_password
+2026-11-23 09:02:30 INFO [AuthService] Account locked: user_id=bob, reason=maximum_failed_attempts_reached
+2026-11-23 09:03:01 INFO [AuthService] User login: user_id=charlie, ip=10.0.1.30
+2026-11-23 09:03:05 INFO [AuthService] Password validated: user_id=charlie
+2026-11-23 09:03:10 INFO [AuthService] Session created: user_id=charlie, session_id=sess_002
+2026-11-23 09:04:01 INFO [AuthService] Token refreshed: user_id=alice
+2026-11-23 09:04:05 INFO [AuthService] Token expired: user_id=charlie, session_id=sess_002
+2026-11-23 09:05:01 INFO [AuthService] User login: user_id=charlie, ip=10.0.1.30
+2026-11-23 09:05:05 INFO [AuthService] Password validated: user_id=charlie
+2026-11-23 09:05:10 INFO [AuthService] Session created: user_id=charlie, session_id=sess_003
+2026-11-23 09:06:01 WARN [AuthService] Multiple sessions detected: user_id=alice, active_sessions=5
+2026-11-23 09:07:01 ERROR [AuthService] Authentication service error: NullPointerException at com.logsentinel.auth.AuthProvider.validateToken(AuthProvider.java:142)
+2026-11-23 09:07:05 ERROR [AuthService] Authentication service error: NullPointerException at com.logsentinel.auth.AuthProvider.validateToken(AuthProvider.java:142)
+2026-11-23 09:07:10 ERROR [AuthService] Authentication service error: NullPointerException at com.logsentinel.auth.AuthProvider.validateToken(AuthProvider.java:142)
+2026-11-23 09:07:15 WARN [AuthService] Falling back to database authentication
+2026-11-23 09:07:20 INFO [AuthService] Database authentication fallback active
+2026-11-23 09:08:01 FATAL [AuthService] Authentication service crashed: out of memory, heap=2048MB
+2026-11-23 09:08:05 INFO [AuthService] Authentication service restarting...
+2026-11-23 09:08:10 INFO [AuthService] Authentication service restarted successfully

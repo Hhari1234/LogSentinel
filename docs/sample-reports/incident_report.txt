@@ -1,0 +1,18 @@
+========================================
+       POTENTIAL INCIDENT REPORT
+========================================
+
+Incident ID: INC-0001
+Service: DatabaseService
+Pattern: Connection timeout: database=primary, host=db-prod-01, port=5432
+Occurrences: 5
+First occurrence: 2026-11-23T11:03:01
+Last occurrence: 2026-11-23T11:03:20
+Window: 1 minute(s)
+Severity: HIGH
+Type: POTENTIAL INCIDENT
+
+----------------------------------------
+
+Note: These are pattern-based potential incidents,
+not confirmed root causes.

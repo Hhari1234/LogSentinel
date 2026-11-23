@@ -1,0 +1,53 @@
+2026-11-23 08:15:02 INFO [AuthService] Application server started
+2026-11-23 08:15:05 INFO [AuthService] Loading configuration from config.yaml
+2026-11-23 08:15:08 DEBUG [AuthService] Initializing database connection pool
+2026-11-23 08:15:10 INFO [AuthService] Database connection pool initialized with 10 connections
+2026-11-23 08:15:12 INFO [PaymentService] Payment service started
+2026-11-23 08:15:15 INFO [OrderService] Order service started
+2026-11-23 08:15:18 INFO [NotificationService] Notification service started
+2026-11-23 08:16:01 INFO [AuthService] User login: user_id=12345, ip=192.168.1.50
+2026-11-23 08:16:05 INFO [AuthService] Token generated for user_id=12345
+2026-11-23 08:16:10 INFO [PaymentService] Payment processed: order_id=ORD-1001, amount=99.99
+2026-11-23 08:16:12 INFO [OrderService] Order created: order_id=ORD-1001, customer_id=5001
+2026-11-23 08:16:15 INFO [NotificationService] Email sent: order_id=ORD-1001, template=order_confirmation
+2026-11-23 08:17:01 WARN [AuthService] Login attempt from unusual location: user_id=12345, ip=10.0.0.99
+2026-11-23 08:17:05 WARN [PaymentService] Payment gateway response time high: 2.3s, order_id=ORD-1002
+2026-11-23 08:17:10 WARN [DatabaseService] Query execution time exceeded threshold: 1.8s, query=SELECT * FROM orders
+2026-11-23 08:17:15 WARN [OrderService] Inventory low: product_id=PROD-500, remaining=5
+2026-11-23 08:18:01 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:05 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:10 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:15 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:20 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:25 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:30 ERROR [DatabaseService] Connection timeout: database=primary, host=db-prod-01, port=5432
+2026-11-23 08:18:35 INFO [DatabaseService] Connection restored: database=primary, host=db-prod-01
+2026-11-23 08:19:01 INFO [AuthService] User logout: user_id=12345
+2026-11-23 08:19:05 INFO [PaymentService] Payment processed: order_id=ORD-1002, amount=149.50
+2026-11-23 08:19:10 INFO [OrderService] Order shipped: order_id=ORD-1001
+2026-11-23 08:19:15 INFO [NotificationService] Email sent: order_id=ORD-1001, template=shipment_notification
+2026-11-23 08:20:01 DEBUG [AuthService] Cache hit: key=user_session_12345
+2026-11-23 08:20:05 DEBUG [OrderService] Cache miss: key=order_history_5001
+2026-11-23 08:20:10 INFO [AuthService] User login: user_id=67890, ip=192.168.1.51
+2026-11-23 08:20:15 INFO [AuthService] Token generated for user_id=67890
+2026-11-23 08:20:20 INFO [PaymentService] Payment processed: order_id=ORD-1003, amount=49.99
+2026-11-23 08:20:25 INFO [OrderService] Order created: order_id=ORD-1003, customer_id=5002
+2026-11-23 08:21:01 WARN [AuthService] Failed login attempt: user_id=unknown, ip=192.168.1.99
+2026-11-23 08:21:05 WARN [AuthService] Failed login attempt: user_id=unknown, ip=192.168.1.99
+2026-11-23 08:21:10 WARN [AuthService] Failed login attempt: user_id=unknown, ip=192.168.1.99
+2026-11-23 08:21:20 WARN [AuthService] Failed login attempt: user_id=unknown, ip=192.168.1.99
+2026-11-23 08:21:30 WARN [AuthService] Failed login attempt: user_id=unknown, ip=192.168.1.99
+2026-11-23 08:22:01 INFO [AuthService] Account locked: user_id=unknown, reason=too_many_failed_attempts
+2026-11-23 08:22:05 INFO [NotificationService] Security alert email sent: user_id=unknown, alert_type=account_locked
+2026-11-23 08:23:01 ERROR [PaymentService] Payment gateway unavailable: gateway=stripe, error_code=503
+2026-11-23 08:23:05 ERROR [PaymentService] Payment gateway unavailable: gateway=stripe, error_code=503
+2026-11-23 08:23:10 ERROR [PaymentService] Payment gateway unavailable: gateway=stripe, error_code=503
+2026-11-23 08:23:15 WARN [PaymentService] Retrying payment: order_id=ORD-1004, attempt=1
+2026-11-23 08:23:20 WARN [PaymentService] Retrying payment: order_id=ORD-1004, attempt=2
+2026-11-23 08:23:25 INFO [PaymentService] Payment gateway restored: gateway=stripe
+2026-11-23 08:23:30 INFO [PaymentService] Payment processed: order_id=ORD-1004, amount=199.99
+2026-11-23 08:24:01 INFO [OrderService] Order created: order_id=ORD-1005, customer_id=5003
+2026-11-23 08:24:05 INFO [NotificationService] Email sent: order_id=ORD-1005, template=order_confirmation
+2026-11-23 08:25:01 INFO [AuthService] Token refreshed: user_id=12345
+2026-11-23 08:25:05 INFO [DatabaseService] Query executed: query=SELECT * FROM users WHERE id=12345, duration=45ms
+2026-11-23 08:25:10 INFO [Application] Health check passed: status=healthy, uptime=10m
