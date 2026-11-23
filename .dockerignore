@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+benchmarks/
+docs/
+reports/
+sample-logs/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+.vercel

@@ -1,15 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "Dockerfile.vercel",
-      "use": "@vercel/docker",
-      "config": {
-        "dockerfile": "Dockerfile.vercel",
-        "context": "."
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
