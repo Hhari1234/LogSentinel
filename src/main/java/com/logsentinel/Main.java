@@ -31,6 +31,8 @@ import java.util.Scanner;
  */
 public final class Main {
 
+    private static final int DEFAULT_PORT = 8080;
+
     private static final DateTimeFormatter TIMESTAMP_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -39,7 +41,15 @@ public final class Main {
 
     public static void main(String[] args) {
         if (args.length > 0 && "--dashboard".equals(args[0])) {
-            int port = 8080;
+            int port = DEFAULT_PORT;
+            String envPort = System.getenv("PORT");
+            if (envPort != null && !envPort.isBlank()) {
+                try {
+                    port = Integer.parseInt(envPort.trim());
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid PORT env var: " + envPort + ", using default " + DEFAULT_PORT);
+                }
+            }
             for (int i = 1; i < args.length; i++) {
                 if ("--port".equals(args[i]) && i + 1 < args.length) {
                     try {
