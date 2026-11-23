@@ -1,0 +1,46 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/adapter/en/help/index.jsp?path=vm_error
+hs_err_pid*
+
+# Maven
+target/
+dependency-reduced-pom.xml
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.iws
+.settings/
+.classpath
+.project
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project outputs
+reports/*.txt
+reports/*.csv
+benchmarks/*.txt
+sample-logs/*.log
